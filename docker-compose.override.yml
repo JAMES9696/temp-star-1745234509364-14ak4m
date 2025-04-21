@@ -1,0 +1,45 @@
+version: '3.7'
+services:
+  flink-jobmanager:
+    build:
+      context: ./flink
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      JOB_MANAGER_RPC_ADDRESS: flink-jobmanager
+    volumes:
+      # 注意：由于代码已复制到镜像中，此卷挂载主要用于开发时的代码热更新
+      # 如果不需要热更新，可以注释掉或移除
+      - ./flink:/opt/flink/usrlib
+    networks:
+      - worldlora-net
+  
+  flink-taskmanager:
+    build:
+      context: ./flink
+      dockerfile: Dockerfile
+    depends_on:
+      - flink-jobmanager
+    command: taskmanager
+    environment:
+      JOB_MANAGER_RPC_ADDRESS: flink-jobmanager
+    volumes:
+      # 同上
+      - ./flink:/opt/flink/usrlib
+    networks:
+      - worldlora-net
+
+volumes:
+  es-data:
+
+# Define the network here as well, marking it as external
+# if it's primarily defined in the base docker-compose.yml
+# Alternatively, just ensure both compose files use the same network name.
+networks:
+  worldlora-net:
+    # If defined in docker-compose.yml, you might not need this block,
+    # or you could mark it external: true if necessary.
+    # external: true
+    driver: bridge # Or remove this if defined in the base file 
