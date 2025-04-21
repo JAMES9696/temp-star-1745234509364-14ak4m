@@ -1,0 +1,44 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# WorldLora Search UI (`worldlora-search`) 指南
+
+这个目录包含了“星际罗盘”项目的前端搜索用户界面，使用 Next.js 构建。
+
+## 项目目标
+
+提供一个用户友好的界面，允许用户搜索存储在后端系统（可能是 Elasticsearch）中的数据，并展示结果。
+
+## 核心技术栈
+
+*   **框架:** [Next.js](mdc:https:/nextjs.org) (使用 App Router)
+*   **语言:** [TypeScript](mdc:https:/www.typescriptlang.org)
+*   **UI 库:** [React](mdc:https:/react.dev)
+*   **样式:** [Tailwind CSS](mdc:https:/tailwindcss.com)
+*   **数据获取:** [SWR](mdc:https:/swr.vercel.app)
+
+## 关键组件与文件
+
+*   **根布局:** `[src/app/layout.tsx](mdc:worldlora-search/src/app/layout.tsx)` - 定义全局布局，并包裹了 `SWRProvider`。
+*   **首页/搜索页:** `[src/app/page.tsx](mdc:worldlora-search/src/app/page.tsx)` - 当前的主页面，集成了搜索框和结果展示。
+*   **搜索框组件:** `[src/components/SearchBox.tsx](mdc:worldlora-search/src/components/SearchBox.tsx)` - 用户输入搜索词的组件。
+*   **用户信息示例:** `[src/components/Example.tsx](mdc:worldlora-search/src/components/Example.tsx)` - 用于演示 SWR 基本用法的组件（可考虑移除或重构）。
+*   **全局 SWR 配置:** `[src/lib/swr-config.tsx](mdc:worldlora-search/src/lib/swr-config.tsx)` - 提供全局 SWR 配置，如 `fetcher` 和缓存策略。
+*   **自定义 Hooks:**
+    *   `[src/hooks/use-data.ts](mdc:worldlora-search/src/hooks/use-data.ts)` - 包含 `useSearch` 和 `useStarDetails` 钩子，封装了调用 API 和使用 SWR 的逻辑。计划中可能还有 `useDebounce`。
+*   **API 路由:**
+    *   `[src/app/api/search/route.ts](mdc:worldlora-search/src/app/api/search/route.ts)` - 处理搜索请求，目前返回模拟数据。
+    *   `[src/app/api/star/[id]/route.ts](mdc:worldlora-search/src/app/api/star/[id]/route.ts)` - 处理根据 ID 获取星体详情的请求，返回模拟数据。
+    *   `[src/app/api/user/route.ts](mdc:worldlora-search/src/app/api/user/route.ts)` - 用于 SWR 示例的用户信息 API（可考虑移除）。
+*   **Tailwind 配置:** `[tailwind.config.js](mdc:worldlora-search/tailwind.config.js)` 和 `[postcss.config.js](mdc:worldlora-search/postcss.config.js)`。
+*   **全局样式:** `[src/app/globals.css](mdc:worldlora-search/src/app/globals.css)`。
+
+## 开发工作流说明
+
+*   **UI 设计与组件生成:** 主要的前端 UI 设计和组件代码生成在 [v0.dev](mdc:https:/v0.dev) 上进行。新的组件或页面布局通常会通过 `npx shadcn add <v0.dev URL>` 等方式从 v0.dev 拉取到本地项目中。
+*   **本地开发重点:** 本地环境的主要任务是**集成前端与后端逻辑**，确保数据流和交互逻辑能够跑通。本地开发不侧重于从零开始创建 UI 组件或追求像素级的视觉效果，而是验证从 v0.dev 获取的代码与后端 API 的协同工作。
+*   **运行与测试:** 项目通过 `npm run dev` 在端口 4000 启动开发服务器（或其他配置的端口）。本地测试的重点是验证功能逻辑和数据交互，而不是 UI 的最终视觉呈现。
+*   **API 对接:** API 路由 (`src/app/api/...`) 需要对接真实的后端服务（如 Elasticsearch）。
+*   **自定义逻辑:** 任何 v0.dev 无法生成的复杂客户端逻辑、状态管理或数据处理逻辑需要在本地补充实现。
