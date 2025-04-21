@@ -1,0 +1,10 @@
+apache-flink==1.17.0
+kafka-python==2.0.2
+elasticsearch==8.11.0
+requests==2.31.0
+beautifulsoup4==4.12.2
+spacy==3.7.2
+# 暂时注释掉pyflink，使用本地测试模式
+# pyflink==1.17.1
+python-dateutil==2.8.2
+zh_core_web_md @ https://github.com/explosion/spacy-models/releases/download/zh_core_web_md-3.7.0/zh_core_web_md-3.7.0.tar.gz 
