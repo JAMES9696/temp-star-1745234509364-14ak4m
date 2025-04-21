@@ -1,0 +1,53 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Docker 网络配置指南 (星际罗盘项目)
+
+为了避免反复出现的容器间网络连接问题（如服务名无法解析 `No address associated with hostname` 或 `Connection refused`），请严格遵循以下 Docker Compose 配置和使用规范：
+
+## 1. 强制使用统一自定义网络
+
+- **所有服务必须在同一网络:** 确保在项目的所有相关 Docker Compose 文件（包括 [docker-compose.yml](mdc:docker-compose.yml)、[docker-compose.override.yml](mdc:docker-compose.override.yml) 以及任何其他定义相关服务的文件，例如可能的 `elasticsearch-compose.yml`）中，为**每一个**需要相互通信的服务（Flink JM/TM, Kafka, ZK, ES, Kibana, PG 等）都显式添加 `networks:` 配置，并指向同一个自定义网络。
+- **定义网络:** 在基础的 `docker-compose.yml` 文件末尾定义这个网络，例如：
+  ```yaml
+  networks:
+    worldlora-net: # 或者 starcompass_network
+      driver: bridge
+  ```
+- **分配服务:** 在每个服务的定义下添加：
+  ```yaml
+  services:
+    some_service:
+      # ... 其他配置 ...
+      networks:
+        - worldlora-net # 使用统一定义的网络名
+  ```
+
+## 2. 始终使用 `-p <project_name>`
+
+- **原因:** 本地项目路径 `D:\星际罗盘` 包含非 ASCII 字符，会导致 `docker compose` 命令无法自动确定项目上下文。
+- **操作:** 在执行**所有** `docker compose` 相关命令（`up`, `down`, `ps`, `exec`, `logs` 等）时，必须带上 `-p` 参数和**固定**的项目名称（仅含 ASCII 字符），例如：
+  ```powershell
+  docker compose -p starcompass up -d
+  docker compose -p starcompass down
+  docker compose -p starcompass exec <service_name> bash
+  ```
+- **一致性:** 使用固定的项目名称能确保所有操作都作用于同一个 Docker 项目实例及其关联的资源（容器、网络、卷）。
+
+## 3. 推荐的启动/停止流程
+
+- **清理优先:** 在每次执行 `up -d` 之前，先运行 `down --remove-orphans` 来清理旧的、可能冲突的容器和网络。
+  ```powershell
+  docker compose -p starcompass down --remove-orphans
+  docker compose -p starcompass up -d
+  ```
+- **谨慎清理数据卷:** 只有在遇到如 Kafka Cluster ID 不匹配等顽固状态问题，且明确知道后果时，才使用 `down --volumes`。这会删除数据！
+
+## 4. 网络验证
+
+- **检查网络成员:** 启动后，使用 `docker network inspect <project_name>_<network_name>` （例如 `starcompass_worldlora-net`）确认所有预期的容器都在网络中。
+- **容器内测试:** 使用 `docker compose -p starcompass exec <service_name> bash` 进入一个容器，然后尝试 `curl <other_service_name>:<port>` 来验证服务名解析和网络连通性。
+
+遵循这些规则可以显著减少因 Docker 网络配置不当导致的问题。
