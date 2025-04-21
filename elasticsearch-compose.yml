@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  es-worldlora:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+    container_name: es-worldlora
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - worldlora-net
+
+  kibana-worldlora:
+    image: docker.elastic.co/kibana/kibana:7.17.0
+    container_name: kibana-worldlora
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es-worldlora:9200
+    depends_on:
+      - es-worldlora
+    networks:
+      - worldlora-net
+
+volumes:
+  es-data:
+
+networks:
+  worldlora-net:
+    external: true 
