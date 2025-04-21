@@ -1,0 +1,47 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 反爬虫策略指南
+
+## 核心策略实现
+[stealth_manager.py](mdc:crawler/utils/stealth_manager.py) 实现了主要的反爬虫策略：
+
+### 时间控制
+- 随机休眠：在请求之间添加随机延迟
+- 动态调整：根据请求频率自动调整延迟时间
+
+### 行为模拟
+- 随机滚动：模拟用户的页面浏览行为
+- 鼠标移动：生成随机的鼠标轨迹
+- User-Agent 轮换：定期更换浏览器标识
+
+## 代理设置
+在 [settings.py](mdc:crawler/config/settings.py) 中配置代理服务器：
+```python
+PROXY_ENABLED = True
+PROXY_HOST = "your_proxy_host"
+PROXY_PORT = "your_proxy_port"
+```
+
+## 浏览器配置
+[base_scraper.py](mdc:crawler/scrapers/base_scraper.py) 中的浏览器设置：
+- 使用 undetected-chromedriver 绕过检测
+- 支持无头模式
+- 自定义 User-Agent
+- 配置代理服务器
+
+## 最佳实践
+1. 定期更新 User-Agent 列表
+2. 使用代理池轮换 IP
+3. 实现请求频率限制
+4. 添加错误重试机制
+5. 监控请求响应状态
+
+## 注意事项
+1. 遵守网站的 robots.txt 规则
+2. 避免频繁的重复请求
+3. 合理设置并发数量
+4. 保持代码的可维护性
+5. 定期更新反爬策略
