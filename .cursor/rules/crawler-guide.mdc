@@ -1,0 +1,55 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 知乎爬虫项目指南
+
+## 项目结构
+这是一个模块化的知乎爬虫项目，使用 Selenium 和 undetected-chromedriver 实现自动化数据采集，并通过 Kafka 进行数据流处理。
+
+### 核心文件
+- [main.py](mdc:crawler/main.py) - 项目入口点，协调爬虫和数据处理流程
+- [requirements.txt](mdc:crawler/requirements.txt) - 项目依赖管理
+
+### 配置模块
+- [settings.py](mdc:crawler/config/settings.py) - 全局配置文件，包含浏览器、代理和 Kafka 设置
+
+### 爬虫模块
+- [base_scraper.py](mdc:crawler/scrapers/base_scraper.py) - 基础爬虫类，提供通用的浏览器自动化功能
+- [zhihu_scraper.py](mdc:crawler/scrapers/zhihu_scraper.py) - 知乎专用爬虫实现
+
+### 工具模块
+- [stealth_manager.py](mdc:crawler/utils/stealth_manager.py) - 反爬虫策略管理器
+- [kafka_producer.py](mdc:crawler/utils/kafka_producer.py) - Kafka 数据生产者
+
+## 开发指南
+
+### 环境配置
+1. 创建并激活 Python 虚拟环境
+2. 安装依赖：`pip install -r requirements.txt`
+3. 配置 `.env` 文件：
+   ```
+   ZHIHU_USERNAME=your_username
+   ZHIHU_PASSWORD=your_password
+   KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+   ```
+
+### 反爬虫策略
+项目实现了多层反爬虫策略：
+1. 随机休眠
+2. 随机滚动
+3. 随机鼠标移动
+4. 随机 User-Agent 轮换
+
+### 数据流
+1. ZhihuScraper 负责数据采集
+2. 采集的数据通过 KafkaProducer 发送到指定 topic
+3. 可以通过配置 Kafka 消费者进行后续处理
+
+### 扩展建议
+1. 添加更多爬虫类型（如问答、专栏等）
+2. 实现数据持久化
+3. 添加代理池支持
+4. 增加失败重试机制
+5. 添加日志记录系统
