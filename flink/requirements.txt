@@ -1,0 +1,6 @@
+apache-flink==1.19.1
+beautifulsoup4==4.12.2
+kafka-python==2.0.2
+python-dateutil==2.8.2
+elasticsearch==7.17.0
+backoff==2.2.1 
