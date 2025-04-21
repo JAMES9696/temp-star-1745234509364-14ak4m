@@ -1,0 +1,63 @@
+name: document-cleansing
+version: "1.0"
+
+source:
+  type: kafka
+  properties:
+    bootstrap.servers: "localhost:9092"
+    group.id: "worldlora-cleansing"
+    topic: "worldlora.capture.raw"
+    deserializer: "org.apache.flink.api.common.serialization.JSONDeserializationSchema"
+
+processing:
+  functions:
+    - name: clean-document
+      steps:
+        - name: extract-metadata
+          type: metadata-extractor
+          config:
+            fields: ["timestamp", "source", "author"]
+        
+        - name: remove-html-tags
+          type: html-cleaner
+          config:
+            preserve-links: true
+        
+        - name: normalize-whitespace
+          type: text-normalizer
+          config:
+            remove-duplicate-spaces: true
+            trim: true
+        
+        - name: language-detect
+          type: language-detector
+          config:
+            model: "langdetect"
+        
+        - name: extract-entities
+          type: ner-processor
+          config:
+            model: "bert-base-multilingual-cased"
+            entity-types: ["PERSON", "ORGANIZATION", "LOCATION"]
+        
+        - name: generate-summary
+          type: text-summarizer
+          config:
+            model: "t5-base"
+            max-length: 150
+        
+        - name: calculate-embeddings
+          type: embedding-generator
+          config:
+            model: "sentence-transformers/all-MiniLM-L6-v2"
+            dimension: 384
+
+sink:
+  type: elasticsearch
+  properties:
+    hosts: "http://localhost:9200"
+    index: "worldlora_docs"
+    bulk-flush:
+      size: 1000
+      interval: 10s
+    serializer: "org.apache.flink.connector.elasticsearch.sink.ElasticsearchSinkFunction" 
