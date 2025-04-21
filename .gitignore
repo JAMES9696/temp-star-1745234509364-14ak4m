@@ -1,0 +1,16 @@
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 但不忽略示例文件
+!.env.example
+
+# 虚拟环境
+.venv/
+
+# Node modules
+node_modules
+
+# Flink specific ignores
+flink/src/data_cleaner.py
