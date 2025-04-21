@@ -1,0 +1,49 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 数据流处理指南
+
+## 数据采集流程
+[zhihu_scraper.py](mdc:crawler/scrapers/zhihu_scraper.py) 负责从知乎获取数据：
+1. 自动登录知乎
+2. 获取问题详情
+3. 提取关键信息
+
+## 数据格式
+采集的数据结构：
+```python
+{
+    'title': '问题标题',
+    'content': '问题描述',
+    'answer_count': '回答数量',
+    'followers': '关注者数量'
+}
+```
+
+## Kafka 集成
+[kafka_producer.py](mdc:crawler/utils/kafka_producer.py) 处理数据发送：
+- 自动序列化 JSON 数据
+- 异步发送消息
+- 错误处理机制
+
+## 配置说明
+在 [settings.py](mdc:crawler/config/settings.py) 中配置 Kafka：
+```python
+KAFKA_BOOTSTRAP_SERVERS = "localhost:9092"
+KAFKA_TOPIC = "zhihu_data"
+```
+
+## 数据处理流程
+1. 爬虫采集原始数据
+2. 数据清洗和格式化
+3. 发送到 Kafka topic
+4. 消费者处理数据（待实现）
+
+## 扩展建议
+1. 添加数据验证
+2. 实现数据清洗管道
+3. 添加数据压缩
+4. 实现数据备份机制
+5. 添加监控和告警
