@@ -1,0 +1,10 @@
+FROM confluentinc/cp-kafka-connect:7.3.0
+
+# 安装 Debezium PostgreSQL 连接器
+RUN confluent-hub install --no-prompt debezium/debezium-connector-postgresql:2.1.4
+
+# 安装其他必要的连接器
+RUN confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:14.0.0
+
+# 设置插件路径
+ENV CONNECT_PLUGIN_PATH="/usr/share/java,/usr/share/confluent-hub-components" 
